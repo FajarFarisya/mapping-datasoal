@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Quiz</title>
+</head>
+<body>
+<div class="container mt-5">
+    <div id="quiz-section" class="card"></div>
+    <div class="d-flex justify-content-between mt-3">
+        <button id="prev-button" class="btn btn-primary" style="display: none;">Sebelumnya</button>
+        <button id="next-button" class="btn btn-primary">Selanjutnya</button>
+    </div>
+</div>
+
+<script>
+    // Correctly define the dataSoal without double encoding
+    let dataSoal = [
+        {"id_soal":"25","id_mapel":"5","nomor":"1","soal":"<p>1+1 = ?</p>","jenis":"1","pilA":"<p>2</p>","pilB":"<p>3</p>","pilC":"<p>4</p>","pilD":"<p>5</p>","pilE":"","jawaban":"A","file":"","file1":"","fileA":"","fileB":"","fileC":"","fileD":"","fileE":"","ket":"Pilih Salah Satu Jawaban Yang Benar","sts":null,"groupsoal":null},
+        {"id_soal":"26","id_mapel":"5","nomor":"2","soal":"<p>2+2 = ?</p>","jenis":"1","pilA":"<p>2</p>","pilB":"<p>4</p>","pilC":"<p>6</p>","pilD":"<p>8</p>","pilE":"","jawaban":"B","file":"","file1":"","fileA":"","fileB":"","fileC":"","fileD":"","fileE":"","ket":"Pilih Salah Satu Jawaban Yang Benar","sts":null,"groupsoal":null},
+        {"id_soal":"27","id_mapel":"5","nomor":"3","soal":"<p>cek uraian panjangggg banget?</p>","jenis":"6","pilA":null,"pilB":null,"pilC":null,"pilD":null,"pilE":null,"jawaban":null,"file":"","file1":"","fileA":null,"fileB":null,"fileC":null,"fileD":null,"fileE":null,"ket":"Isi Uraian","sts":null,"groupsoal":null},
+        {"id_soal":"75","id_mapel":"5","nomor":"4","soal":"<p>3+3 adalah..</p>","jenis":"1","pilA":"<p>6</p>","pilB":"<p>7</p>","pilC":"<p>8</p>","pilD":"<p>9</p>","pilE":"","jawaban":"A","file":"","file1":"","fileA":"","fileB":"","fileC":"","fileD":"","fileE":"","ket":"Pilih Salah Satu Jawaban Yang Benar","sts":null,"groupsoal":null},
+        {"id_soal":"76","id_mapel":"5","nomor":"5","soal":"<p>9+1 adalah..</p>","jenis":"1","pilA":"<p>10</p>","pilB":"<p>11</p>","pilC":"<p>12</p>","pilD":"<p>13</p>","pilE":"","jawaban":"A","file":"","file1":"","fileA":"","fileB":"","fileC":"","fileD":"","fileE":"","ket":"Pilih Salah Satu Jawaban Yang Benar","sts":null,"groupsoal":null},
+        {"id_soal":"77","id_mapel":"5","nomor":"6","soal":"<p>10+10 adalah...</p>","jenis":"1","pilA":"<p>20</p>","pilB":"<p style=\"text-align: left;\">21</p>","pilC":"<p>22</p>","pilD":"<p>23</p>","pilE":"","jawaban":"A","file":"","file1":"","fileA":"","fileB":"","fileC":"","fileD":"","fileE":"","ket":"Pilih Salah Satu Jawaban Yang Benar","sts":null,"groupsoal":null},
+        {"id_soal":"78","id_mapel":"5","nomor":"7","soal":"<p>uraian singkat?</p>","jenis":"2","pilA":null,"pilB":null,"pilC":null,"pilD":null,"pilE":null,"jawaban":"iya","file":"","file1":"","fileA":null,"fileB":null,"fileC":null,"fileD":null,"fileE":null,"ket":"Isi Uraian Singkat","sts":null,"groupsoal":null},
+        {"id_soal":"79","id_mapel":"5","nomor":"8","soal":"<p>benar, salah, benar, salah .. ikuti pertunjuk tersebut</p>","jenis":"4","pilA":"<p>benarkeun</p>","pilB":"<p>salahkeun</p>","pilC":"<p>benarkeun 2</p>","pilD":"<p>salahkeun 2</p>","pilE":"","jawaban":"B, S, B, S","file":"","file1":"","fileA":"","fileB":"","fileC":"","fileD":"","fileE":"","ket":"Pilih Jawaban Benar Salah","sts":null,"groupsoal":null},
+        {"id_soal":"80","id_mapel":"5","nomor":"9","soal":"<p>sebutkan 1 sampai 2</p>","jenis":"3","pilA":"<p>pertama</p>","pilB":"<p>kedua</p>","pilC":"<p>ketiga</p>","pilD":"<p>keempat</p>","pilE":"","jawaban":"A, B","file":"","file1":"","fileA":"","fileB":"","fileC":"","fileD":"","fileE":"","ket":"Pilih Jawaban Yang Semua dianggap Benar","sts":null,"groupsoal":null}
+    ];
+
+    // Store dataSoal in localStorage as JSON
+    localStorage.setItem('soalData', JSON.stringify(dataSoal));
+    
+    // Parse dataSoal from localStorage
+    const soalData = JSON.parse(localStorage.getItem('soalData'));
+
+    let currentSoalIndex = 0;
+
+    function displaySoal(index) {
+        const soal = soalData[index];
+        const container = document.getElementById('quiz-section');
+
+        container.innerHTML = `
+            <div class="card-body">
+                <h5 class="card-title">Soal No. ${soal.nomor}</h5>
+                <p class="card-text">${soal.soal}</p>
+                <p class="card-text"><small class="text-muted">${soal.ket}</small></p>
+                ${renderOptions(soal)}
+            </div>
+        `;
+
+        // Show/Hide Previous button
+        const prevButton = document.getElementById('prev-button');
+        if (index === 0) {
+            prevButton.style.display = 'none';
+        } else {
+            prevButton.style.display = 'inline-block';
+        }
+
+        // Update Next button text
+        const nextButton = document.getElementById('next-button');
+        if (index === soalData.length - 1) {
+            nextButton.innerText = 'Selesai';
+        } else {
+            nextButton.innerText = 'Selanjutnya';
+        }
+    }
+
+    function renderOptions(soal) {
+        let html = '';
+        if (soal.jenis == "1") {
+            html += `
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="soal_${soal.id_soal}" value="A" id="pilA">
+                    <label class="form-check-label" for="pilA">${soal.pilA}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="soal_${soal.id_soal}" value="B" id="pilB">
+                    <label class="form-check-label" for="pilB">${soal.pilB}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="soal_${soal.id_soal}" value="C" id="pilC">
+                    <label class="form-check-label" for="pilC">${soal.pilC}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="soal_${soal.id_soal}" value="D" id="pilD">
+                    <label class="form-check-label" for="pilD">${soal.pilD}</label>
+                </div>
+            `;
+        } else if (soal.jenis == "2" || soal.jenis == "6") {
+            html += `<textarea class="form-control" name="soal_${soal.id_soal}" rows="3"></textarea>`;
+        } else if (soal.jenis == "4") {
+            html += `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="soal_${soal.id_soal}[]" value="A" id="pilA">
+                    <label class="form-check-label" for="pilA">${soal.pilA}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="soal_${soal.id_soal}[]" value="B" id="pilB">
+                    <label class="form-check-label" for="pilB">${soal.pilB}</label>
+                </div>
+            `;
+        }
+        return html;
+    }
+
+    document.getElementById('next-button').addEventListener('click', () => {
+        if (currentSoalIndex < soalData.length - 1) {
+            currentSoalIndex++;
+            displaySoal(currentSoalIndex);
+        }
+    });
+
+    document.getElementById('prev-button').addEventListener('click', () => {
+        if (currentSoalIndex > 0) {
+            currentSoalIndex--;
+            displaySoal(currentSoalIndex);
+        }
+    });
+
+    // Display the first question
+    displaySoal(currentSoalIndex);
+</script>
+</body>
+</html>
